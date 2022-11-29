@@ -1,7 +1,11 @@
 <template>
   <div class="container">
-    <Header title="Sample sample"/>
-    <Tasks :tasks="tasks" />
+    <Header @toggle-add-task="toggleAddTask" title="Sample sample"
+    :showAddTask="showAddTask"/>
+    <div v-show="showAddTask">
+      <AddTask @add-task="addTask"/>
+    </div>
+    <Tasks @toggle-reminder="toggleReminder" @delete-task="deleteTask" :tasks="tasks" />
   </div>
 </template>
 
@@ -9,6 +13,7 @@
 <script>
 import Header from './components/Header'
 import Tasks from './components/Tasks'
+import AddTask from './components/AddTask'
 
 
 export default {
@@ -16,19 +21,38 @@ export default {
   components: {
     Header,
     Tasks,
+    AddTask,
   },
   data(){
     return {
-      tasks: []
+      tasks: [],
+      showAddTask: false
     }
   },
-  created(){
-    this.tasks = [
+
+  methods: {
+    toggleAddTask(){
+      this.showAddTask = !this.showAddTask
+    },
+    addTask(task){
+      this.tasks= [...this.tasks, task]
+    },
+    deleteTask(id){
+      if(confirm('Are you sure?')){
+        this.tasks = this.tasks.filter((task)=>task.id !== id)
+      }
+    },
+    toggleReminder(id){
+      this.tasks = this.tasks.map((task) => task.id === id ? {...task, reminder: !task.reminder}: task )
+    }
+  },
+    created(){
+      this.tasks = [
       {
         id: 1,
         text: 'Doc Appointment',
         day: 'March 1st 5:00pm',
-        reminder: true,
+        reminder: false,
       },
       {
         id: 2,
